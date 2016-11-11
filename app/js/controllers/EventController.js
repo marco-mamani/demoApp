@@ -3,7 +3,7 @@
 eventsApp.controller('EventController',
     function EventController($scope) {
         $scope.snippet = '<span style="color:red">hi there</span>';
-        $scope.boolValue = false;
+        $scope.boolValue = true;
         $scope.mystyle = {color:'red'};
         $scope.myclass = "blue";
         $scope.buttonDisabled = true;
