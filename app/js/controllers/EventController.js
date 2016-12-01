@@ -1,7 +1,7 @@
 'use strict';
 
 eventsApp.controller('EventController',
-    function EventController($scope, eventData, $log) {
+    function EventController($scope, eventData) {
         $scope.sortorder = 'name';
         $scope.event = eventData.getEvent()
             .$promise
