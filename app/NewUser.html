@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="eventsApp">
+<head>
+    <meta charset="UTF-8">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/app.css"/>
+</head>
+<body ng-cloak>
+<div class="container">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <ul class="nav">
+                <li><a href="/NewUser.html">Create User</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div ng-controller="EditUserController" style="padding-left: 20px; padding-right: 20px">
+        <h1>New User</h1>
+        <hr />
+        <form name="newUserForm">
+            <fieldset>
+                <label for="firstName">First Name:</label>
+                <input id="firstName" type="text" required ng-model="user.firstName" placeholder="First Name..." />
+                <label for="lastName">Last Name:</label>
+                <input id="lastName" type="text" required ng-model="user.lastName" placeholder="Last Name..." />
+                <label for="loginName">Login Name:</label>
+                <input id="loginName" type="text" required ng-model="user.loginName" placeholder="Login Name..." />
+                <label for="password">Password:</label>
+                <input id="password" type="text" required ng-model="user.password" placeholder="Password..." />
+                <br />
+                <label for="email">Email:</label>
+                <input id="email" type="text" ng-model="user.email" class="input-small" placeholder="Email..." />
+                <label for="avatar">Image:</label>
+                <input id="avatar" type="url" ng-model="user.avatar" class="input-xlarge" placeholder="URL of your avatar..." />
+            </fieldset>
+
+            <img ng-src="{{user.avatar}}" src="" />
+            <br />
+            <br />
+
+            <button type="submit" ng-disabled="newUserForm.$invalid" ng-click="saveUser(user, newUserForm)" class="btn btn-primary">Save</button>
+            <button type="button" ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
+
+        </form>
+    </div>
+</div>
+
+<script src="/lib/jquery.min.js"></script>
+<script src="/lib/underscore-1.4.4.min.js"></script>
+<script src="/lib/bootstrap.min.js"></script>
+<script src="/lib/angular/angular.js" ></script>
+<script src="/lib/angular/angular-resource.js" ></script>
+<script src="/lib/angular/angular-sanitize.js" ></script>
+<script src="/js/app.js"></script>
+<script src="/js/controllers/UserController.js"></script>
+<script src="/js/controllers/EditUserController.js"></script>
+<script src="/js/services/UserData.js"></script>
+<script src="/js/filters.js"></script>
+
+</body>
+</html>
