@@ -1,8 +1,8 @@
 'use strict';
 
 usersApp.controller('EditUserController',
-    function EditUserController($scope, userData) {
-        $scope.saveEvent = function (user, newUserForm) {
+    function EditUserController($scope, userData, gravatarUrlBuilderUser) {
+        $scope.saveUser = function (user, newUserForm) {
             // console.log(newEventForm);
             if (newUserForm.$valid) {
                 userData.save(user)
@@ -15,6 +15,10 @@ usersApp.controller('EditUserController',
 
         $scope.cancelEdit = function () {
             window.location = "/EventDetails.htm";
+        }
+
+        $scope.getGravatarUrl = function(email) {
+            return gravatarUrlBuilderUser.buildGravatarUrlUser(email);
         }
     }
 );

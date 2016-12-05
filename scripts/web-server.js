@@ -11,8 +11,8 @@ app.use(bodyParser.json());
 app.use(express.static(rootPath + '/app'));
 app.get('/data/event/:id', events.get);
 app.post('/data/event/:id', events.save);
-app.post('/data/users', users.save);  //Crea un nuevo usuario
-app.get('/data/users/:id', users.get);  //Obtiene la information de un nuevo usuario
+app.post('/data/user/:id', users.save);  //Crea un nuevo usuario
+app.get('/data/user/:id', users.get);  //Obtiene la information de un nuevo usuario
 // app.put('/data/users/:id', users.put);  //Actualiza un usuario
 // app.delete('/data/users/:id', users.delete);  //Borra un usuario
 

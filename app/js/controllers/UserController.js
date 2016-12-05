@@ -2,9 +2,9 @@
 
 usersApp.controller('UserController',
     function UserController($scope, userData) {
-        $scope.user = userData.getUsers()
+        $scope.users = userData.getUsers()
             .$promise
-            .then(function (user) {$scope.user = user; })
+            .then(function (users) {$scope.users = users; })
             .catch(function (response) {console.log(response);}
         );
     }

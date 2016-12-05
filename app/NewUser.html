@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="eventsApp">
+<html lang="en" ng-app="usersApp">
 <head>
     <meta charset="UTF-8">
     <title>User Registration</title>
@@ -11,6 +11,7 @@
     <div class="navbar">
         <div class="navbar-inner">
             <ul class="nav">
+                <li><a href="/NewEvent.htm">Create Event</a></li>
                 <li><a href="/NewUser.html">Create User</a></li>
             </ul>
         </div>
@@ -28,15 +29,16 @@
                 <label for="loginName">Login Name:</label>
                 <input id="loginName" type="text" required ng-model="user.loginName" placeholder="Login Name..." />
                 <label for="password">Password:</label>
-                <input id="password" type="text" required ng-model="user.password" placeholder="Password..." />
+                <input id="password" type="password" required ng-model="user.password" placeholder="Password..." />
                 <br />
                 <label for="email">Email:</label>
-                <input id="email" type="text" ng-model="user.email" class="input-small" placeholder="Email..." />
-                <label for="avatar">Image:</label>
+                <input id="email" type="text" ng-pattern='/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i' ng-model="user.email" class="input-small" placeholder="Email..." />
+                <!-- <label for="avatar">Image:</label>
                 <input id="avatar" type="url" ng-model="user.avatar" class="input-xlarge" placeholder="URL of your avatar..." />
+                -->
             </fieldset>
 
-            <img ng-src="{{user.avatar}}" src="" />
+            <img ng-src="{{getGravatarUrl(user.email)}}"/>
             <br />
             <br />
 
@@ -56,6 +58,7 @@
 <script src="/js/app.js"></script>
 <script src="/js/controllers/UserController.js"></script>
 <script src="/js/controllers/EditUserController.js"></script>
+<script src="/js/services/GravatarUrlBuilderUser.js"></script>
 <script src="/js/services/UserData.js"></script>
 <script src="/js/filters.js"></script>
 
