@@ -1,0 +1,669 @@
+/***** QUERY ****/
+select 
+	p.* 
+from 
+	PACKAGE p 
+left outer join 
+	PACKAGE_TENANT_PACKAGES ptp
+on 
+	(p.id = ptp.package_id and ptp.tenant_uuid = '61FECDBD-1CB6-4781-A3CB-13BCB8158AE1')
+where 
+	(
+		(ptp.status is not null and ptp.status = 'DEFAULT')
+		or 
+		(ptp.status is null and p.global = 1 and p.status = 'DEFAULT')
+	)
+
+/****** Object:  Table [dbo].[PACKAGE]    Script Date: 4/14/2023 4:05:35 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[PACKAGE](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[name] [nvarchar](255) NOT NULL,
+	[label] [nvarchar](255) NULL,
+	[package_version] [nvarchar](255) NOT NULL,
+	[command_count] [int] NULL,
+	[iterator_count] [int] NULL,
+	[conditional_count] [int] NULL,
+	[variable_count] [int] NULL,
+	[group] [nvarchar](1024) NULL,
+	[artifact_name] [nvarchar](1024) NULL,
+	[code_version] [nvarchar](255) NULL,
+	[status] [nvarchar](64) NULL,
+	[created_by] [bigint] NOT NULL,
+	[created_on] [datetime2](7) NOT NULL,
+	[updated_by] [bigint] NOT NULL,
+	[updated_on] [datetime2](7) NOT NULL,
+	[tenant_id] [bigint] NOT NULL,
+	[version] [bigint] NOT NULL,
+	[published_date] [datetime2](7) NOT NULL,
+	[author] [nvarchar](255) NOT NULL,
+	[exception_count] [int] NOT NULL,
+	[content] [varbinary](max) NULL,
+	[trigger_count] [int] NOT NULL,
+	[global] [bit] NOT NULL,
+	[latest] [bit] NOT NULL,
+	[sha] [char](64) NULL,
+	[recommended_control_room_version] [nvarchar](255) NULL,
+	[recommended_bot_agent_version] [nvarchar](255) NULL,
+ CONSTRAINT [PK_PACKAGE.id] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [UQ_PACKAGE_NAME_VERSION] UNIQUE NONCLUSTERED 
+(
+	[name] ASC,
+	[package_version] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [DF_PACKAGE_published_date]  DEFAULT (sysdatetime()) FOR [published_date]
+GO
+
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [DF_PACKAGE_author]  DEFAULT ('Automation Anywhere') FOR [author]
+GO
+
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [DF_PACKAGE_exception_count]  DEFAULT ((0)) FOR [exception_count]
+GO
+
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [DF_PACKAGE_trigger_count]  DEFAULT ((0)) FOR [trigger_count]
+GO
+
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [DF_PACKAGE_global]  DEFAULT ((0)) FOR [global]
+GO
+
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [DF_PACKAGE_latest]  DEFAULT ((0)) FOR [latest]
+GO
+
+/****** Object:  Table [dbo].[PACKAGE_TENANT_PACKAGES]    Script Date: 4/14/2023 4:06:20 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[PACKAGE_TENANT_PACKAGES](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[package_id] [bigint] NOT NULL,
+	[tenant_uuid] [uniqueidentifier] NULL,
+	[status] [nvarchar](64) NULL,
+ CONSTRAINT [PK_PACKAGE_TENANT_PACKAGES.id] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [UQ_PACKAGE_TENANT_PACKAGES.package_id.tenant_uuid] UNIQUE NONCLUSTERED 
+(
+	[package_id] ASC,
+	[tenant_uuid] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[PACKAGE_TENANT_PACKAGES]  WITH CHECK ADD  CONSTRAINT [FK_PACKAGE_TENANT_PACKAGES.package_id] FOREIGN KEY([package_id])
+REFERENCES [dbo].[PACKAGE] ([id])
+GO
+
+ALTER TABLE [dbo].[PACKAGE_TENANT_PACKAGES] CHECK CONSTRAINT [FK_PACKAGE_TENANT_PACKAGES.package_id]
+GO
+
+/****** Object:  Table [dbo].[PACKAGE_LOCALIZED_CONTENT]    Script Date: 4/14/2023 4:07:53 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[PACKAGE_LOCALIZED_CONTENT](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[package_id] [bigint] NOT NULL,
+	[locale] [nvarchar](64) NULL,
+	[label] [nvarchar](255) NULL,
+	[content] [varbinary](max) NULL,
+ CONSTRAINT [PK_PACKAGE_LOCALIZED_CONTENT.id] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [UQ_PACKAGE_LOCALIZED_CONTENT.package_id.locale] UNIQUE NONCLUSTERED 
+(
+	[package_id] ASC,
+	[locale] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[PACKAGE_LOCALIZED_CONTENT]  WITH CHECK ADD  CONSTRAINT [FK_PACKAGE_LOCALIZED_CONTENT.package_id] FOREIGN KEY([package_id])
+REFERENCES [dbo].[PACKAGE] ([id])
+GO
+
+ALTER TABLE [dbo].[PACKAGE_LOCALIZED_CONTENT] CHECK CONSTRAINT [FK_PACKAGE_LOCALIZED_CONTENT.package_id]
+GO
+
+
+INDEXES:
+/****** PACKAGE table ******/
+SET ANSI_PADDING ON
+GO
+
+/****** Object:  Index [IX_PACKAGE_status_with_name]    Script Date: 4/14/2023 4:08:44 PM ******/
+CREATE NONCLUSTERED INDEX [IX_PACKAGE_status_with_name] ON [dbo].[PACKAGE]
+(
+	[status] ASC
+)
+INCLUDE([name]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+/****** Object:  Index [PK_PACKAGE.id]    Script Date: 4/14/2023 4:09:23 PM ******/
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [PK_PACKAGE.id] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+SET ANSI_PADDING ON
+GO
+
+/****** Object:  Index [UQ_PACKAGE_NAME_VERSION]    Script Date: 4/14/2023 4:09:50 PM ******/
+ALTER TABLE [dbo].[PACKAGE] ADD  CONSTRAINT [UQ_PACKAGE_NAME_VERSION] UNIQUE NONCLUSTERED 
+(
+	[name] ASC,
+	[package_version] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+/****** PTP table ******/
+SET ANSI_PADDING ON
+GO
+
+/****** Object:  Index [IX_PACKAGE_TENANT_PACKAGES_tenant_uuid_status]    Script Date: 4/14/2023 4:11:17 PM ******/
+CREATE NONCLUSTERED INDEX [IX_PACKAGE_TENANT_PACKAGES_tenant_uuid_status] ON [dbo].[PACKAGE_TENANT_PACKAGES]
+(
+	[tenant_uuid] ASC,
+	[status] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+/****** Object:  Index [PK_PACKAGE_TENANT_PACKAGES.id]    Script Date: 4/14/2023 4:12:19 PM ******/
+ALTER TABLE [dbo].[PACKAGE_TENANT_PACKAGES] ADD  CONSTRAINT [PK_PACKAGE_TENANT_PACKAGES.id] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+/****** Object:  Index [UQ_PACKAGE_TENANT_PACKAGES.package_id.tenant_uuid]    Script Date: 4/14/2023 4:12:38 PM ******/
+ALTER TABLE [dbo].[PACKAGE_TENANT_PACKAGES] ADD  CONSTRAINT [UQ_PACKAGE_TENANT_PACKAGES.package_id.tenant_uuid] UNIQUE NONCLUSTERED 
+(
+	[package_id] ASC,
+	[tenant_uuid] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+
+/****** PACKAGE_LOCALIZED_CONTENT table ******/
+SET ANSI_PADDING ON
+GO
+
+/****** Object:  Index [IX_PACKAGE_LOCALIZED_CONTENT_locale_with_package_id_label]    Script Date: 4/14/2023 4:13:02 PM ******/
+CREATE NONCLUSTERED INDEX [IX_PACKAGE_LOCALIZED_CONTENT_locale_with_package_id_label] ON [dbo].[PACKAGE_LOCALIZED_CONTENT]
+(
+	[locale] ASC
+)
+INCLUDE([package_id],[label]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+/****** Object:  Index [PK_PACKAGE_LOCALIZED_CONTENT.id]    Script Date: 4/14/2023 4:13:44 PM ******/
+ALTER TABLE [dbo].[PACKAGE_LOCALIZED_CONTENT] ADD  CONSTRAINT [PK_PACKAGE_LOCALIZED_CONTENT.id] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+/****** Object:  Index [PK_PACKAGE_LOCALIZED_CONTENT.id]    Script Date: 4/14/2023 4:13:44 PM ******/
+ALTER TABLE [dbo].[PACKAGE_LOCALIZED_CONTENT] ADD  CONSTRAINT [PK_PACKAGE_LOCALIZED_CONTENT.id] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+
+/****************** EXECUTION PLAN ******************/
+<?xml version="1.0" encoding="utf-16"?>
+<ShowPlanXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.6" Build="14.0.1000.169" xmlns="http://schemas.microsoft.com/sqlserver/2004/07/showplan">
+  <BatchSequence>
+    <Batch>
+      <Statements>
+        <StmtSimple StatementCompId="1" StatementEstRows="17.7756" StatementId="1" StatementOptmLevel="FULL" StatementOptmEarlyAbortReason="GoodEnoughPlanFound" CardinalityEstimationModelVersion="140" StatementSubTreeCost="0.0465755" StatementText="select &#xD;&#xA;	p.* &#xD;&#xA;from &#xD;&#xA;	PACKAGE p &#xD;&#xA;left outer join &#xD;&#xA;	PACKAGE_TENANT_PACKAGES ptp&#xD;&#xA;on &#xD;&#xA;	(p.id = ptp.package_id and ptp.tenant_uuid = '61FECDBD-1CB6-4781-A3CB-13BCB8158AE1')&#xD;&#xA;where &#xD;&#xA;	(&#xD;&#xA;		(ptp.status is not null and ptp.status = 'DEFAULT')&#xD;&#xA;		or &#xD;&#xA;		(ptp.status is null and p.global = 1 and p.status = 'DEFAULT')&#xD;&#xA;	)" StatementType="SELECT" QueryHash="0x81EF6FAFC6F5E333" QueryPlanHash="0x7BD288C194F98212" RetrievedFromCache="true" SecurityPolicyApplied="false">
+          <StatementSetOptions ANSI_NULLS="true" ANSI_PADDING="true" ANSI_WARNINGS="true" ARITHABORT="true" CONCAT_NULL_YIELDS_NULL="true" NUMERIC_ROUNDABORT="false" QUOTED_IDENTIFIER="true" />
+          <QueryPlan DegreeOfParallelism="1" CachedPlanSize="64" CompileTime="2" CompileCPU="2" CompileMemory="464">
+            <MemoryGrantInfo SerialRequiredMemory="0" SerialDesiredMemory="0" />
+            <OptimizerHardwareDependentProperties EstimatedAvailableMemoryGrant="415613" EstimatedPagesCached="207806" EstimatedAvailableDegreeOfParallelism="4" MaxCompileMemory="9271352" />
+            <OptimizerStatsUsage>
+              <StatisticsInfo Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Statistics="[IX_PACKAGE_TENANT_PACKAGES_tenant_uuid_status]" ModificationCount="6" SamplingPercent="100" LastUpdate="2023-03-28T12:00:35.04" />
+              <StatisticsInfo Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Statistics="[_WA_Sys_00000019_51BA1E3A]" ModificationCount="170" SamplingPercent="100" LastUpdate="2023-03-28T11:17:13.02" />
+              <StatisticsInfo Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Statistics="[PK_PACKAGE.id]" ModificationCount="170" SamplingPercent="100" LastUpdate="2023-03-28T11:17:09.5" />
+              <StatisticsInfo Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Statistics="[IX_PACKAGE_status_with_name]" ModificationCount="437" SamplingPercent="100" LastUpdate="2023-03-28T11:17:09.49" />
+              <StatisticsInfo Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Statistics="[UQ_PACKAGE_TENANT_PACKAGES.package_id.tenant_uuid]" ModificationCount="6" SamplingPercent="100" LastUpdate="2023-03-28T12:00:35.04" />
+              <StatisticsInfo Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Statistics="[PK_PACKAGE_TENANT_PACKAGES.id]" ModificationCount="3" SamplingPercent="100" LastUpdate="2023-03-28T12:00:35.04" />
+              <StatisticsInfo Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Statistics="[_WA_Sys_00000004_16644E42]" ModificationCount="6" SamplingPercent="100" LastUpdate="2023-03-28T12:00:37.49" />
+            </OptimizerStatsUsage>
+            <WaitStats>
+              <Wait WaitType="ASYNC_NETWORK_IO" WaitTimeMs="154" WaitCount="445" />
+            </WaitStats>
+            <QueryTimeStats CpuTime="12" ElapsedTime="165" />
+            <RelOp AvgRowSize="8060" EstimateCPU="0.00041888" EstimateIO="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row" EstimateRows="17.7756" LogicalOp="Filter" NodeId="0" Parallel="false" PhysicalOp="Filter" EstimatedTotalSubtreeCost="0.0465755">
+              <OutputList>
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="id" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="name" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="label" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="package_version" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="command_count" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="iterator_count" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="conditional_count" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="variable_count" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="group" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="artifact_name" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="code_version" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="status" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_by" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_on" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_by" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_on" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="tenant_id" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="version" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="published_date" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="author" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="exception_count" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="content" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="trigger_count" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="global" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="latest" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="sha" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_control_room_version" />
+                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_bot_agent_version" />
+              </OutputList>
+              <RunTimeInformation>
+                <RunTimeCountersPerThread Thread="0" ActualRows="92" Batches="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row" ActualElapsedms="0" ActualCPUms="0" />
+              </RunTimeInformation>
+              <Filter StartupExpression="false">
+                <RelOp AvgRowSize="8078" EstimateCPU="0.0059893" EstimateIO="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row" EstimateRows="176" LogicalOp="Right Outer Join" NodeId="1" Parallel="false" PhysicalOp="Merge Join" EstimatedTotalSubtreeCost="0.0461567">
+                  <OutputList>
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="id" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="name" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="label" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="package_version" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="command_count" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="iterator_count" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="conditional_count" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="variable_count" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="group" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="artifact_name" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="code_version" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="status" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_by" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_on" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_by" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_on" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="tenant_id" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="version" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="published_date" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="author" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="exception_count" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="content" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="trigger_count" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="global" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="latest" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="sha" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_control_room_version" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_bot_agent_version" />
+                    <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                  </OutputList>
+                  <RunTimeInformation>
+                    <RunTimeCountersPerThread Thread="0" ActualRows="173" Batches="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" />
+                  </RunTimeInformation>
+                  <Merge ManyToMany="false">
+                    <InnerSideJoinColumns>
+                      <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="id" />
+                    </InnerSideJoinColumns>
+                    <OuterSideJoinColumns>
+                      <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="package_id" />
+                    </OuterSideJoinColumns>
+                    <Residual>
+                      <ScalarOperator ScalarString="[a360.29].[dbo].[PACKAGE].[id] as [p].[id]=[a360.29].[dbo].[PACKAGE_TENANT_PACKAGES].[package_id] as [ptp].[package_id]">
+                        <Compare CompareOp="EQ">
+                          <ScalarOperator>
+                            <Identifier>
+                              <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="id" />
+                            </Identifier>
+                          </ScalarOperator>
+                          <ScalarOperator>
+                            <Identifier>
+                              <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="package_id" />
+                            </Identifier>
+                          </ScalarOperator>
+                        </Compare>
+                      </ScalarOperator>
+                    </Residual>
+                    <RelOp AvgRowSize="51" EstimateCPU="1.672E-05" EstimateIO="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row" EstimateRows="4" LogicalOp="Inner Join" NodeId="2" Parallel="false" PhysicalOp="Nested Loops" EstimatedTotalSubtreeCost="0.00706052">
+                      <OutputList>
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="package_id" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                      </OutputList>
+                      <RunTimeInformation>
+                        <RunTimeCountersPerThread Thread="0" ActualRows="4" Batches="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row" ActualElapsedms="0" ActualCPUms="0" />
+                      </RunTimeInformation>
+                      <NestedLoops Optimized="false">
+                        <OuterReferences>
+                          <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="id" />
+                        </OuterReferences>
+                        <RelOp AvgRowSize="39" EstimateCPU="0.0001614" EstimateIO="0.003125" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row" EstimateRows="4" EstimatedRowsRead="4" LogicalOp="Index Scan" NodeId="3" Parallel="false" PhysicalOp="Index Scan" EstimatedTotalSubtreeCost="0.0032864" TableCardinality="4">
+                          <OutputList>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="id" />
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="package_id" />
+                          </OutputList>
+                          <RunTimeInformation>
+                            <RunTimeCountersPerThread Thread="0" ActualRows="4" ActualRowsRead="4" Batches="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row" ActualElapsedms="0" ActualCPUms="0" ActualScans="1" ActualLogicalReads="2" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" />
+                          </RunTimeInformation>
+                          <IndexScan Ordered="true" ScanDirection="FORWARD" ForcedIndex="false" ForceSeek="false" ForceScan="false" NoExpandHint="false" Storage="RowStore">
+                            <DefinedValues>
+                              <DefinedValue>
+                                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="id" />
+                              </DefinedValue>
+                              <DefinedValue>
+                                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="package_id" />
+                              </DefinedValue>
+                            </DefinedValues>
+                            <Object Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Index="[UQ_PACKAGE_TENANT_PACKAGES.package_id.tenant_uuid]" Alias="[ptp]" IndexKind="NonClustered" Storage="RowStore" />
+                          </IndexScan>
+                        </RelOp>
+                        <RelOp AvgRowSize="75" EstimateCPU="0.0001581" EstimateIO="0.003125" EstimateRebinds="3" EstimateRewinds="0" EstimatedExecutionMode="Row" EstimateRows="4" LogicalOp="Clustered Index Seek" NodeId="5" Parallel="false" PhysicalOp="Clustered Index Seek" EstimatedTotalSubtreeCost="0.0037574" TableCardinality="4">
+                          <OutputList>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                          </OutputList>
+                          <RunTimeInformation>
+                            <RunTimeCountersPerThread Thread="0" ActualRows="4" ActualRowsRead="4" Batches="0" ActualEndOfScans="0" ActualExecutions="4" ActualExecutionMode="Row" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="8" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" />
+                          </RunTimeInformation>
+                          <IndexScan Lookup="true" Ordered="true" ScanDirection="FORWARD" ForcedIndex="false" ForceSeek="false" ForceScan="false" NoExpandHint="false" Storage="RowStore">
+                            <DefinedValues>
+                              <DefinedValue>
+                                <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                              </DefinedValue>
+                            </DefinedValues>
+                            <Object Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Index="[PK_PACKAGE_TENANT_PACKAGES.id]" Alias="[ptp]" TableReferenceId="-1" IndexKind="Clustered" Storage="RowStore" />
+                            <SeekPredicates>
+                              <SeekPredicateNew>
+                                <SeekKeys>
+                                  <Prefix ScanType="EQ">
+                                    <RangeColumns>
+                                      <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="id" />
+                                    </RangeColumns>
+                                    <RangeExpressions>
+                                      <ScalarOperator ScalarString="[a360.29].[dbo].[PACKAGE_TENANT_PACKAGES].[id] as [ptp].[id]">
+                                        <Identifier>
+                                          <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="id" />
+                                        </Identifier>
+                                      </ScalarOperator>
+                                    </RangeExpressions>
+                                  </Prefix>
+                                </SeekKeys>
+                              </SeekPredicateNew>
+                            </SeekPredicates>
+                            <Predicate>
+                              <ScalarOperator ScalarString="[a360.29].[dbo].[PACKAGE_TENANT_PACKAGES].[tenant_uuid] as [ptp].[tenant_uuid]={guid'61FECDBD-1CB6-4781-A3CB-13BCB8158AE1'}">
+                                <Compare CompareOp="EQ">
+                                  <ScalarOperator>
+                                    <Identifier>
+                                      <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="tenant_uuid" />
+                                    </Identifier>
+                                  </ScalarOperator>
+                                  <ScalarOperator>
+                                    <Const ConstValue="{guid'61FECDBD-1CB6-4781-A3CB-13BCB8158AE1'}" />
+                                  </ScalarOperator>
+                                </Compare>
+                              </ScalarOperator>
+                            </Predicate>
+                          </IndexScan>
+                        </RelOp>
+                      </NestedLoops>
+                    </RelOp>
+                    <RelOp AvgRowSize="8060" EstimateCPU="0.0003473" EstimateIO="0.0327546" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row" EstimateRows="173" EstimatedRowsRead="173" LogicalOp="Clustered Index Scan" NodeId="6" Parallel="false" PhysicalOp="Clustered Index Scan" EstimatedTotalSubtreeCost="0.0331019" TableCardinality="173">
+                      <OutputList>
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="id" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="name" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="label" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="package_version" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="command_count" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="iterator_count" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="conditional_count" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="variable_count" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="group" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="artifact_name" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="code_version" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="status" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_by" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_on" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_by" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_on" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="tenant_id" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="version" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="published_date" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="author" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="exception_count" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="content" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="trigger_count" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="global" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="latest" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="sha" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_control_room_version" />
+                        <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_bot_agent_version" />
+                      </OutputList>
+                      <Warnings>
+                        <ColumnsWithNoStatistics>
+                          <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="status" />
+                          <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="global" />
+                        </ColumnsWithNoStatistics>
+                      </Warnings>
+                      <RunTimeInformation>
+                        <RunTimeCountersPerThread Thread="0" ActualRows="173" ActualRowsRead="173" Batches="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row" ActualElapsedms="0" ActualCPUms="0" ActualScans="1" ActualLogicalReads="43" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" />
+                      </RunTimeInformation>
+                      <IndexScan Ordered="true" ScanDirection="FORWARD" ForcedIndex="false" ForceSeek="false" ForceScan="false" NoExpandHint="false" Storage="RowStore">
+                        <DefinedValues>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="id" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="name" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="label" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="package_version" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="command_count" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="iterator_count" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="conditional_count" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="variable_count" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="group" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="artifact_name" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="code_version" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="status" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_by" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="created_on" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_by" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="updated_on" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="tenant_id" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="version" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="published_date" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="author" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="exception_count" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="content" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="trigger_count" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="global" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="latest" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="sha" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_control_room_version" />
+                          </DefinedValue>
+                          <DefinedValue>
+                            <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="recommended_bot_agent_version" />
+                          </DefinedValue>
+                        </DefinedValues>
+                        <Object Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Index="[PK_PACKAGE.id]" Alias="[p]" IndexKind="Clustered" Storage="RowStore" />
+                      </IndexScan>
+                    </RelOp>
+                  </Merge>
+                </RelOp>
+                <Predicate>
+                  <ScalarOperator ScalarString="([a360.29].[dbo].[PACKAGE_TENANT_PACKAGES].[status] as [ptp].[status]=N'DEFAULT' OR [a360.29].[dbo].[PACKAGE_TENANT_PACKAGES].[status] as [ptp].[status] IS NULL AND [a360.29].[dbo].[PACKAGE].[global] as [p].[global]=(1) AND [a360.29].[dbo].[PACKAGE].[status] as [p].[status]=N'DEFAULT') AND ([a360.29].[dbo].[PACKAGE_TENANT_PACKAGES].[status] as [ptp].[status] IS NULL OR [a360.29].[dbo].[PACKAGE_TENANT_PACKAGES].[status] as [ptp].[status]=N'DEFAULT')">
+                    <Logical Operation="AND">
+                      <ScalarOperator>
+                        <Logical Operation="OR">
+                          <ScalarOperator>
+                            <Compare CompareOp="EQ">
+                              <ScalarOperator>
+                                <Identifier>
+                                  <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                                </Identifier>
+                              </ScalarOperator>
+                              <ScalarOperator>
+                                <Const ConstValue="N'DEFAULT'" />
+                              </ScalarOperator>
+                            </Compare>
+                          </ScalarOperator>
+                          <ScalarOperator>
+                            <Logical Operation="AND">
+                              <ScalarOperator>
+                                <Compare CompareOp="IS">
+                                  <ScalarOperator>
+                                    <Identifier>
+                                      <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                                    </Identifier>
+                                  </ScalarOperator>
+                                  <ScalarOperator>
+                                    <Const ConstValue="NULL" />
+                                  </ScalarOperator>
+                                </Compare>
+                              </ScalarOperator>
+                              <ScalarOperator>
+                                <Compare CompareOp="EQ">
+                                  <ScalarOperator>
+                                    <Identifier>
+                                      <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="global" />
+                                    </Identifier>
+                                  </ScalarOperator>
+                                  <ScalarOperator>
+                                    <Const ConstValue="(1)" />
+                                  </ScalarOperator>
+                                </Compare>
+                              </ScalarOperator>
+                              <ScalarOperator>
+                                <Compare CompareOp="EQ">
+                                  <ScalarOperator>
+                                    <Identifier>
+                                      <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE]" Alias="[p]" Column="status" />
+                                    </Identifier>
+                                  </ScalarOperator>
+                                  <ScalarOperator>
+                                    <Const ConstValue="N'DEFAULT'" />
+                                  </ScalarOperator>
+                                </Compare>
+                              </ScalarOperator>
+                            </Logical>
+                          </ScalarOperator>
+                        </Logical>
+                      </ScalarOperator>
+                      <ScalarOperator>
+                        <Logical Operation="OR">
+                          <ScalarOperator>
+                            <Compare CompareOp="IS">
+                              <ScalarOperator>
+                                <Identifier>
+                                  <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                                </Identifier>
+                              </ScalarOperator>
+                              <ScalarOperator>
+                                <Const ConstValue="NULL" />
+                              </ScalarOperator>
+                            </Compare>
+                          </ScalarOperator>
+                          <ScalarOperator>
+                            <Compare CompareOp="EQ">
+                              <ScalarOperator>
+                                <Identifier>
+                                  <ColumnReference Database="[a360.29]" Schema="[dbo]" Table="[PACKAGE_TENANT_PACKAGES]" Alias="[ptp]" Column="status" />
+                                </Identifier>
+                              </ScalarOperator>
+                              <ScalarOperator>
+                                <Const ConstValue="N'DEFAULT'" />
+                              </ScalarOperator>
+                            </Compare>
+                          </ScalarOperator>
+                        </Logical>
+                      </ScalarOperator>
+                    </Logical>
+                  </ScalarOperator>
+                </Predicate>
+              </Filter>
+            </RelOp>
+          </QueryPlan>
+        </StmtSimple>
+      </Statements>
+    </Batch>
+  </BatchSequence>
+</ShowPlanXML>
+
+
+
+
+
+
+
+
